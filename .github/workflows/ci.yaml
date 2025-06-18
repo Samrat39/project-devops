@@ -47,7 +47,8 @@ jobs:
           uses: golangci/golangci-lint-action@v6
           with:
             version: v1.55.2
-            args: run
+            args: ./...
+
             working-directory: ultimate-devops-project-demo/src/product-catalog
 
     docker:
