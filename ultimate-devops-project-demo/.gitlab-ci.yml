@@ -1,0 +1,66 @@
+stages:
+  - build
+  - test
+  - lint
+  - docker
+  - deploy
+
+variables:
+  GO_VERSION: "1.22"
+  IMAGE_TAG: "$CI_REGISTRY_IMAGE/product-catalog:$CI_PIPELINE_ID"
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_TLS_CERTDIR: ""
+
+before_script:
+  - echo "Using Go $GO_VERSION"
+  - export PATH=$PATH:/usr/local/go/bin
+
+build:
+  stage: build
+  image: golang:${GO_VERSION}
+  script:
+    - cd src/product-catalog
+    - go mod download
+    - go build -o product-catalog-service main.go
+  artifacts:
+    paths:
+      - src/product-catalog/product-catalog-service
+
+unit_tests:
+  stage: test
+  image: golang:${GO_VERSION}
+  script:
+    - cd src/product-catalog
+    - go test ./...
+
+lint:
+  stage: lint
+  image: golangci/golangci-lint:v1.55.2
+  script:
+    - cd src/product-catalog
+    - golangci-lint run
+
+docker_build_push:
+  stage: docker
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  script:
+    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_TOKEN"
+    - docker build -t $IMAGE_TAG src/product-catalog
+    - docker push $IMAGE_TAG
+
+update_k8s:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - sed -i "s|image: .*|image: $IMAGE_TAG|" kubernetes/productcatalog/deploy.yaml
+    - git config --global user.email "abhishek@gmail.com"
+    - git config --global user.name "Abhishek Veeramalla"
+    - git add kubernetes/productcatalog/deploy.yaml
+    - git commit -m "[CI]: Update product catalog image tag"
+    - git push origin HEAD:main
+  only:
+    - main
+  dependencies:
+    - docker_build_push
