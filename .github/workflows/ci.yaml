@@ -22,13 +22,13 @@ jobs:
         
         - name: Build
           run: |
-            cd src/product-catalog
+            cd ultimate-devops-project-demo/src/product-catalog
             go mod download
             go build -o product-catalog-service main.go
 
         - name: unit tests
           run: |
-            cd src/product-catalog
+            cd ultimate-devops-project-demo/src/product-catalog
             go test ./...
     
     code-quality:
@@ -48,7 +48,7 @@ jobs:
           with:
             version: v1.55.2
             run: golangci-lint run
-            working-directory: src/product-catalog
+            working-directory: ultimate-devops-project-demo/src/product-catalog
 
     docker:
         runs-on: ubuntu-latest
@@ -71,8 +71,8 @@ jobs:
         - name: Docker Push
           uses: docker/build-push-action@v6
           with:
-            context: src/product-catalog
-            file: src/product-catalog/Dockerfile
+            context: ultimate-devops-project-demo/src/product-catalog
+            file: ultimate-devops-project-demo/src/product-catalog/Dockerfile
             push: true
             tags: ${{ secrets.DOCKER_USERNAME }}/product-catalog:${{github.run_id}}
 
