@@ -85,23 +85,27 @@ jobs:
         run: |
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/product-catalog:${{ github.run_id }}|" ultimate-devops-project-demo/kubernetes/productcatalog/deploy.yaml
 
-
       - name: Commit and Push Changes
         env:
           TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git config --global user.name "Manoj choudhry"
-          git config --global user.email "manojsamrat32@gmail.com"
+          git config --global user.email "manoj@example.com"
 
-          # Checkout the branch of the PR (source branch)
-          git fetch origin ${{ github.head_ref }} && git checkout ${{ github.head_ref }}
+          # Ensure you fetch the right branch and switch to it
+          git fetch origin ${{ github.head_ref }}
+          git checkout ${{ github.head_ref }}
 
-          # Update remote with PAT token
-          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
+          # Remove old remote and add fresh one with token
+          git remote remove origin
+          git remote add origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
 
           git add ultimate-devops-project-demo/kubernetes/productcatalog/deploy.yaml
-          git commit -m "[CI]: Update product catalog image tag" || echo "No changes"
+          git commit -m "[CI]: Update product catalog image tag" || echo "No changes to commit"
+
+          # Push to PR source branch
           git push origin ${{ github.head_ref }}
+
 
 
 
