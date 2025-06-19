@@ -88,19 +88,21 @@ jobs:
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/product-catalog:${{ github.run_id }}|" ultimate-devops-project-demo/kubernetes/productcatalog/deploy.yaml
 
       - name: Commit and Push Changes
+        env:
+          TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git config --global user.name "Manoj choudhry"
           git config --global user.email "manoj@example.com"
 
-          # Checkout correct branch to avoid detached HEAD
-          git checkout ${{ github.head_ref }}
+          BRANCH_NAME="${GITHUB_HEAD_REF:-main}"
 
-          # Set remote to use PAT
-          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}
-
+          git checkout "${BRANCH_NAME}" || git checkout -b "${BRANCH_NAME}"
+          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
+    
           git add ultimate-devops-project-demo/kubernetes/productcatalog/deploy.yaml
           git commit -m "[CI]: Update product catalog image tag" || echo "No changes to commit"
-          git push origin ${{ github.head_ref }}
+          git push origin "${BRANCH_NAME}"
+
 
 
 
