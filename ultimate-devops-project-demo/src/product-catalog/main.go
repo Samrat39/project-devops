@@ -309,7 +309,7 @@ func (p *productCatalog) checkProductFailure(ctx context.Context, id string) boo
 	return failureEnabled
 }
 
-func (ctx context.Context, svcAddr string) (*grpc.ClientConn, error) {
+func createClient(ctx context.Context, svcAddr string) (*grpc.ClientConn, error) {
 	return grpc.DialContext(ctx, svcAddr,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithStatsHandler(otelgrpc.NewClientHandler()),
