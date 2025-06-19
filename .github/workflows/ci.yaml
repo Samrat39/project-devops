@@ -101,7 +101,8 @@ jobs:
     
           git add ultimate-devops-project-demo/kubernetes/productcatalog/deploy.yaml
           git commit -m "[CI]: Update product catalog image tag" || echo "No changes to commit"
-          git push origin "${BRANCH_NAME}"
+          git push --force-with-lease origin "${BRANCH_NAME}"
+
 
 
 
