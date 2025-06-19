@@ -89,19 +89,22 @@ jobs:
 
       - name: Commit and Push Changes
         env:
-          TOKEN: ${{ secrets.PAT_TOKEN }}
+         TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
-          git config --global user.name "Manoj choudhry"
-          git config --global user.email "manoj@example.com"
+            git config --global user.name "Manoj choudhry"
+            git config --global user.email "manoj@example.com"
 
-          BRANCH_NAME="${GITHUB_HEAD_REF:-main}"
+            BRANCH_NAME="${GITHUB_HEAD_REF:-main}"
 
-          git checkout "${BRANCH_NAME}" || git checkout -b "${BRANCH_NAME}"
-          git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
-    
-          git add ultimate-devops-project-demo/kubernetes/productcatalog/deploy.yaml
-          git commit -m "[CI]: Update product catalog image tag" || echo "No changes to commit"
-          git push --force-with-lease origin "${BRANCH_NAME}"
+            git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
+            git fetch --prune origin "${BRANCH_NAME}"
+            git checkout "${BRANCH_NAME}" || git checkout -b "${BRANCH_NAME}"
+
+            git add ultimate-devops-project-demo/kubernetes/productcatalog/deploy.yaml
+            git commit -m "[CI]: Update product catalog image tag" || echo "No changes to commit"
+
+            git push --force-with-lease origin "${BRANCH_NAME}"
+
 
 
 
