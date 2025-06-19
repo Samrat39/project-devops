@@ -91,10 +91,17 @@ jobs:
           TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git config --global user.name "Manoj choudhry"
-          git config --global user.email "manoj@example.com"
+          git config --global user.email "manojsamrat32@gmail.com"
+
+          # Checkout the branch of the PR (source branch)
+          git fetch origin ${{ github.head_ref }} && git checkout ${{ github.head_ref }}
+
+          # Update remote with PAT token
           git remote set-url origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
+
           git add ultimate-devops-project-demo/kubernetes/productcatalog/deploy.yaml
           git commit -m "[CI]: Update product catalog image tag" || echo "No changes"
-          git push origin HEAD:${{ github.head_ref }}
+          git push origin ${{ github.head_ref }}
+
 
 
