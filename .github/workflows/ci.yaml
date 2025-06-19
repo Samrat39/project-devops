@@ -80,32 +80,28 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Update Image Tag in Deployment Manifest
         run: |
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/product-catalog:${{ github.run_id }}|" ultimate-devops-project-demo/kubernetes/productcatalog/deploy.yaml
 
       - name: Commit and Push Changes
-        env:
-          TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git config --global user.name "Manoj choudhry"
           git config --global user.email "manoj@example.com"
 
-          # Ensure you fetch the right branch and switch to it
-          git fetch origin ${{ github.head_ref }}
+          # Checkout correct branch to avoid detached HEAD
           git checkout ${{ github.head_ref }}
 
-          # Remove old remote and add fresh one with token
-          git remote remove origin
-          git remote add origin https://x-access-token:${TOKEN}@github.com/${{ github.repository }}
+          # Set remote to use PAT
+          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}
 
           git add ultimate-devops-project-demo/kubernetes/productcatalog/deploy.yaml
           git commit -m "[CI]: Update product catalog image tag" || echo "No changes to commit"
-
-          # Push to PR source branch
           git push origin ${{ github.head_ref }}
-############
+
 
 
 
