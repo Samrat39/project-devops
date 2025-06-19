@@ -91,4 +91,5 @@ jobs:
           git config --global user.email "manojsamrat32@gmail.com"
           git add ultimate-devops-project-demo/kubernetes/productcatalog/deploy.yaml
           git commit -m "[CI]: Update product catalog image tag"
-          git push origin main
+          git push origin HEAD:${{ github.head_ref }}
+
