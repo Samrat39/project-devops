@@ -46,7 +46,7 @@ jobs:
         with:
           version: v1.55.2
           working-directory: ultimate-devops-project-demo/src/product-catalog
-          args: run ./...
+          args: ./...
 
   docker:
     runs-on: ubuntu-latest
