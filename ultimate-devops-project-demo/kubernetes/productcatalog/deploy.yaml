@@ -34,15 +34,15 @@ spec:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
-          image: samrat320/product-catalog:15781157560
+          image: samrat320/product-catalog:15781192967
 =======
-          image: samrat320/product-catalog:15781157560
+          image: samrat320/product-catalog:15781192967
 >>>>>>> 90d21ade96f516b7d3abb3eff2006604ef72ffb7
 =======
-          image: samrat320/product-catalog:15781157560
+          image: samrat320/product-catalog:15781192967
 >>>>>>> 3998e21803c6a812eb75f29c168997f3a5007dfc
 =======
-          image: samrat320/product-catalog:15781157560
+          image: samrat320/product-catalog:15781192967
 >>>>>>> c5c9d7f967c4f9ad97cf88aee4426590f22dcaed
           imagePullPolicy: IfNotPresent
           ports:
