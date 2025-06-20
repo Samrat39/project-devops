@@ -1,4 +1,4 @@
-# gitlab actions pipeline
+# gitlab actions pipe
 name: product-catalog-ci
 
 on:
