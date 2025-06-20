@@ -32,10 +32,14 @@ spec:
       containers:
         - name: productcatalogservice
 <<<<<<< HEAD
+<<<<<<< HEAD
           image: samrat320/product-catalog:15770523492
 =======
           image: samrat320/product-catalog:15771272434
 >>>>>>> 90d21ade96f516b7d3abb3eff2006604ef72ffb7
+=======
+          image: samrat320/product-catalog:15771312892
+>>>>>>> 3998e21803c6a812eb75f29c168997f3a5007dfc
           imagePullPolicy: IfNotPresent
           ports:
             
