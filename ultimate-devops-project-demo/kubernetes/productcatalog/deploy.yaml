@@ -34,6 +34,10 @@ spec:
 
           image: samrat320/product-catalog:15790923539
 
+<<<<<<< HEAD
+=======
+          image: samrat320/product-catalog:15790936599
+>>>>>>> c3d67970feb98bc57dfb957bda0a3ec8426f460d
 
 
           imagePullPolicy: IfNotPresent
