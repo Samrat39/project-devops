@@ -92,5 +92,5 @@ spec:
             runAsGroup: 101
             runAsNonRoot: true
             runAsUser: 101
-          volumeMounts:
-      volumes:
+          volumeMounts: []
+      volumes: []
