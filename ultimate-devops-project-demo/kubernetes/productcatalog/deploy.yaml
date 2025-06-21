@@ -32,7 +32,8 @@ spec:
       containers:
         - name: productcatalogservice
 
-          image: samrat320/product-catalog:15792256133
+
+          image: samrat320/product-catalog:15792257554
 
 
           imagePullPolicy: IfNotPresent
