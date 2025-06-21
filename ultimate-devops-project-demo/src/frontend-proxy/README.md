@@ -9,5 +9,8 @@ directory. Environment variables are substituted at deploy-time.
 
 wow !!
 wow !!
+<<<<<<< HEAD
 wow !!
 Great!!
+=======
+>>>>>>> b50cc864f2839493fd0411b2d6b30683f1f56e85
