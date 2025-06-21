@@ -31,7 +31,7 @@ spec:
       serviceAccountName: opentelemetry-demo
       containers:
         - name: frontendproxy
-          image: samrat320/frontend-proxy:15799264683
+          image: samrat320/frontend-proxy:15799270117
           imagePullPolicy: IfNotPresent
           ports:
             
