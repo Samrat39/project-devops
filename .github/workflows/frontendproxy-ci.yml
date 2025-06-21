@@ -8,6 +8,7 @@ on:
       - main
     paths:
       - 'ultimate-devops-project-demo/src/frontend-proxy/**'
+      - 'ultimate-devops-project-demo/kubernetes/frontendproxy/**'
       - '.github/workflows/frontendproxy-ci.yml'
   pull_request:
     branches:
