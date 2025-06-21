@@ -33,11 +33,11 @@ spec:
         - name: productcatalogservice
 
 <<<<<<< HEAD
-          image: samrat320/product-catalog:15790923539
+          image: samrat320/product-catalog:15791035935
 
-          image: samrat320/product-catalog:15790954778
+          image: samrat320/product-catalog:15791035935
 =======
-          image: samrat320/product-catalog:15790994808
+          image: samrat320/product-catalog:15791035935
 >>>>>>> a99929d9e3dc8f2feb30231f3f11c173434cda36
 
 
