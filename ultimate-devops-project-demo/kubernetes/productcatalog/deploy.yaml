@@ -33,7 +33,7 @@ spec:
         - name: productcatalogservice
 
 
-          image: samrat320/product-catalog:15790860007
+          image: samrat320/product-catalog:15790875135
 
 
           imagePullPolicy: IfNotPresent
