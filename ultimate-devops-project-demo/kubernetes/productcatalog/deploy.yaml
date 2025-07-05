@@ -35,6 +35,7 @@ spec:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
           image: samrat320/product-catalog:16087849771
 =======
           image: samrat320/product-catalog:16087857003
@@ -42,6 +43,9 @@ spec:
 =======
           image: samrat320/product-catalog:16087848684
 >>>>>>> 1a8d0b9042f65b899f90640c73b9852ac84bd517
+=======
+          image: samrat320/product-catalog:16087844269
+>>>>>>> acc7eac6d87ec4737acd79c53aa28d600db48dca
 
 
           imagePullPolicy: IfNotPresent
