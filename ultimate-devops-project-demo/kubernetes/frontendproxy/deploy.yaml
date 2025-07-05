@@ -31,7 +31,7 @@ spec:
       serviceAccountName: opentelemetry-demo
       containers:
         - name: frontendproxy
-          image: samrat320/frontend-proxy:16087851967
+          image: samrat320/frontend-proxy:16088149125
           imagePullPolicy: IfNotPresent
           ports:
             
@@ -61,17 +61,17 @@ spec:
               value: 'opentelemetry-demo-frontend'
             - name: FRONTEND_PORT
               value: "8080"
-            - name: GRAFANA_SERVICE_HOST
-              value: 'opentelemetry-demo-grafana'
-            - name: GRAFANA_SERVICE_PORT
+            - name: GRAFANA_HOST
+              value: "monitoring-grafana.monitoring.svc.cluster.local"
+            - name: GRAFANA_PORT
               value: "80"
             - name: IMAGE_PROVIDER_HOST
               value: 'opentelemetry-demo-imageprovider'
             - name: IMAGE_PROVIDER_PORT
               value: "8081"
-            - name: JAEGER_SERVICE_HOST
-              value: 'opentelemetry-demo-jaeger-query'
-            - name: JAEGER_SERVICE_PORT
+            - name: JAEGER_HOST
+              value: "jaeger-query.monitoring.svc.cluster.local"
+            - name: JAEGER_PORT
               value: "16686"
             - name: LOCUST_WEB_HOST
               value: 'opentelemetry-demo-loadgenerator'
