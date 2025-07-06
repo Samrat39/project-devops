@@ -34,7 +34,7 @@ spec:
 
 
 
-          image: samrat320/frontend-proxy:16094728365
+          image: samrat320/frontend-proxy:16094734413
 
 
           imagePullPolicy: IfNotPresent
