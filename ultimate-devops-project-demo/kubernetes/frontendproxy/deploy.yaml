@@ -33,7 +33,7 @@ spec:
         - name: frontendproxy
 
 
-          image: samrat320/frontend-proxy:16094324949
+          image: samrat320/frontend-proxy:16094372941
 
           imagePullPolicy: IfNotPresent
           ports:
