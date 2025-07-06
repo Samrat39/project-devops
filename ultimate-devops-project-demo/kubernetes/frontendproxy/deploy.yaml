@@ -35,6 +35,7 @@ spec:
 
           image: samrat320/frontend-proxy:16094434593
 
+
           imagePullPolicy: IfNotPresent
           ports:
             
