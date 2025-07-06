@@ -33,7 +33,15 @@ spec:
         - name: productcatalogservice
 
 
+<<<<<<< HEAD
           image: samrat320/product-catalog:16094238526
+=======
+<<<<<<< HEAD
+          image: samrat320/product-catalog:16094255319
+=======
+          image: samrat320/product-catalog:16094224523
+>>>>>>> 0b9e3e424063236557f83b5c5c627c6d6051361c
+>>>>>>> 4b2172b (redfvcx)
 
 
           imagePullPolicy: IfNotPresent
