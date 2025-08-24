@@ -34,12 +34,12 @@ spec:
 
 
 <<<<<<< HEAD
-          image: samrat320/product-catalog:17186401750
+          image: samrat320/product-catalog:17186420247
 =======
 <<<<<<< HEAD
-          image: samrat320/product-catalog:17186401750
+          image: samrat320/product-catalog:17186420247
 =======
-          image: samrat320/product-catalog:17186401750
+          image: samrat320/product-catalog:17186420247
 >>>>>>> 0b9e3e424063236557f83b5c5c627c6d6051361c
 >>>>>>> 4b2172b (redfvcx)
 
