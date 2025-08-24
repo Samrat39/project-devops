@@ -41,11 +41,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+         token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Go 1.22
         uses: actions/setup-go@v4
         with:
           go-version: '1.22'
+          cache-dependency-path: ultimate-devops-project-demo/src/product-catalog/go.sum
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
