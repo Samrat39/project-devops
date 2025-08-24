@@ -108,7 +108,7 @@ jobs:
             git checkout "${BRANCH_NAME}" || git checkout -b "${BRANCH_NAME}"
 
             git add ultimate-devops-project-demo/kubernetes/productcatalog/deploy.yaml
-            git commit -m "[CI]: Update product catalog image tag" || echo "No changes to commit"
+            git commit -m "Update product catalog image tag [skip-ci]" || echo "No changes to commit"
 
             git push --force-with-lease origin "${BRANCH_NAME}"
 
