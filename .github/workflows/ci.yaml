@@ -99,7 +99,7 @@ jobs:
          TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
             git config --global user.name "Manoj choudhry"
-            git config --global user.email "manoj@example.com"
+            git config --global user.email "manojsamrat32@gmail.com"
 
             BRANCH_NAME="${GITHUB_HEAD_REF:-main}"
 
