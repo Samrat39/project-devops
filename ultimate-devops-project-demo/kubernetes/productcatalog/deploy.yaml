@@ -34,7 +34,7 @@ spec:
 
 
 
-          image: samrat320/product-catalog:17192112560
+          image: samrat320/product-catalog:17192135529
 
 
           imagePullPolicy: IfNotPresent
