@@ -33,7 +33,9 @@ spec:
         - name: productcatalogservice
 
 
-          image: samrat320/product-catalog:16094238526
+
+          image: samrat320/product-catalog:17186512086
+
 
           imagePullPolicy: IfNotPresent
           ports:
