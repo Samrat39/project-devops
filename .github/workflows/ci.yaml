@@ -41,8 +41,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-         token: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Setup Go 1.22
         uses: actions/setup-go@v4
@@ -86,13 +84,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: docker
 
-  
-    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.DOCKER_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Update Image Tag in Deployment Manifest
         run: |
@@ -100,7 +96,7 @@ jobs:
 
       - name: Commit and Push Changes
         env:
-         TOKEN: ${{ secrets.DOCKER_TOKEN }}
+         TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
             git config --global user.name "Manoj choudhry"
             git config --global user.email "manoj@example.com"
