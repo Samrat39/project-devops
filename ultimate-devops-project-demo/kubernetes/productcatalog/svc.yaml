@@ -17,7 +17,7 @@ spec:
   ports:
     - port: 8088
       name: tcp-service
-      targetPort: 8088
+      targetPort: 8080
   selector:
     
     opentelemetry.io/name: opentelemetry-demo-productcatalogservice
