@@ -7,7 +7,7 @@ spec:
   hosts:
     - "shop.example.com"
   gateways:
-    - frontendproxy-gateway
+    - ecommerce/frontendproxy-gateway
   http:
     - match:
         - uri:
