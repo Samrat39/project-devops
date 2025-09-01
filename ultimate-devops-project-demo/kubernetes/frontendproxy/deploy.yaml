@@ -32,7 +32,7 @@ spec:
       containers:
         - name: frontendproxy
 
-          image: samrat320/frontend-proxy:17379109694
+          image: samrat320/frontend-proxy:17379128220
 
           imagePullPolicy: IfNotPresent
           ports:
