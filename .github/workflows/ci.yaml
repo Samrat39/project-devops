@@ -57,6 +57,7 @@ jobs:
           cache-dependency-path: ultimate-devops-project-demo/src/${{ matrix.service }}/go.sum
 
       - name: Run golangci-lint
+        if: ${{ matrix.service == 'product-catalog' }}
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.55.2
