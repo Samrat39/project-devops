@@ -1,19 +1,22 @@
-name: product-catalog-ci
+name: microservices-ci
 
 on:
   push:
     branches:
       - main
     paths-ignore:
-      - 'ultimate-devops-project-demo/kubernetes/productcatalog/deploy.yaml'
+      - 'ultimate-devops-project-demo/kubernetes/**/deploy.yaml'
   pull_request:
     branches:
       - main
 
 jobs:
-  build:
-    if: "! contains(github.event.head_commit.message, '[skip-ci]')"
+  build-test:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci]') }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [product-catalog, frontend-proxy]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,18 +28,22 @@ jobs:
 
       - name: Download Dependencies & Build
         run: |
-          cd ultimate-devops-project-demo/src/product-catalog
+          cd ultimate-devops-project-demo/src/${{ matrix.service }}
           go mod download
-          go build -o product-catalog-service main.go
+          go build -o ${{ matrix.service }}-service main.go
 
       - name: Run Unit Tests
         run: |
-          cd ultimate-devops-project-demo/src/product-catalog
+          cd ultimate-devops-project-demo/src/${{ matrix.service }}
           go test ./...
 
   code-quality:
-    if: "! contains(github.event.head_commit.message, '[skip-ci]')"
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci]') }}
+
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [product-catalog, frontend-proxy]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -45,19 +52,23 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: '1.22'
-          cache-dependency-path: ultimate-devops-project-demo/src/product-catalog/go.sum
+          cache-dependency-path: ultimate-devops-project-demo/src/${{ matrix.service }}/go.sum
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.55.2
-          working-directory: ultimate-devops-project-demo/src/product-catalog
+          working-directory: ultimate-devops-project-demo/src/${{ matrix.service }}
           args: ./...
 
   docker:
-    if: "! contains(github.event.head_commit.message, '[skip-ci]')"
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci]') }}
+
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-test
+    strategy:
+      matrix:
+        service: [product-catalog, frontend-proxy]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -74,15 +85,19 @@ jobs:
       - name: Build & Push Docker Image
         uses: docker/build-push-action@v6
         with:
-          context: ultimate-devops-project-demo/src/product-catalog
-          file: ultimate-devops-project-demo/src/product-catalog/Dockerfile
+          context: ultimate-devops-project-demo/src/${{ matrix.service }}
+          file: ultimate-devops-project-demo/src/${{ matrix.service }}/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/product-catalog:${{ github.run_id }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:${{ github.run_id }}
 
-  updatek8s:
-    if: "! contains(github.event.head_commit.message, '[skip-ci]')"
+  update-k8s:
+    if: ${{ !contains(github.event.head_commit.message, '[skip-ci]') }}
+
     runs-on: ubuntu-latest
     needs: docker
+    strategy:
+      matrix:
+        service: [product-catalog, frontend-proxy]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -91,7 +106,8 @@ jobs:
 
       - name: Update Image Tag in Deployment Manifest
         run: |
-          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/product-catalog:${{ github.run_id }}|" ultimate-devops-project-demo/kubernetes/productcatalog/deploy.yaml
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:${{ github.run_id }}|" \
+          ultimate-devops-project-demo/kubernetes/${{ matrix.service }}/deploy.yaml
 
       - name: Commit and Push Changes
         env:
@@ -106,7 +122,7 @@ jobs:
           git fetch --prune origin "${BRANCH_NAME}"
           git checkout "${BRANCH_NAME}" || git checkout -b "${BRANCH_NAME}"
 
-          git add ultimate-devops-project-demo/kubernetes/productcatalog/deploy.yaml
-          git commit -m "Update product catalog image tag [skip-ci]" || echo "No changes to commit"
+          git add ultimate-devops-project-demo/kubernetes/${{ matrix.service }}/deploy.yaml
+          git commit -m "Update ${{ matrix.service }} image tag [skip-ci]" || echo "No changes to commit"
 
           git push origin "${BRANCH_NAME}"

@@ -15,8 +15,9 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 8088
-      name: tcp-service
+    - name: http-service
+      port: 8088
+      protocol: TCP
       targetPort: 8088
   selector:
     

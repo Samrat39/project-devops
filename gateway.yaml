@@ -1,0 +1,26 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: ecommerce-gateway
+  namespace: ecommerce
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - shop.example.com
+  
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    hosts:
+    - shop.example.com
+    tls:
+      mode: SIMPLE
+      credentialName: shop-tls-cert
+
