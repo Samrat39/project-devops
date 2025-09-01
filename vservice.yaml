@@ -1,19 +1,19 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: productcatalog
+  name: frontendproxy-vs
   namespace: ecommerce
 spec:
   hosts:
-  - shop.example.com
+    - "shop.example.com"
   gateways:
-  - ecommerce-gateway
+    - frontendproxy-gateway
   http:
-  - match:
-    - uri:
-        prefix: /
-    route:
-    - destination:
-        host: opentelemetry-demo-productcatalogservice.ecommerce.svc.cluster.local
-        port:
-          number: 8088
+    - match:
+        - uri:
+            prefix: /
+      route:
+        - destination:
+            host: opentelemetry-demo-frontendproxy.ecommerce.svc.cluster.local
+            port:
+              number: 8080
