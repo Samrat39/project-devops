@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [product-catalog, frontend-proxy]
+        service: [productcatalog, frontendproxy]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
