@@ -123,6 +123,8 @@ jobs:
           git fetch --prune origin "${BRANCH_NAME}"
           git checkout "${BRANCH_NAME}" || git checkout -b "${BRANCH_NAME}"
 
+          git pull origin "${BRANCH_NAME}" --rebase
+
           git add ultimate-devops-project-demo/kubernetes/${{ matrix.service }}/deploy.yaml
           git commit -m "Update ${{ matrix.service }} image tag [skip-ci]" || echo "No changes to commit"
 
