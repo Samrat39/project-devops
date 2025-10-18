@@ -5,9 +5,9 @@ metadata:
   namespace: ecommerce
 spec:
   hosts:
-    - "shop.example.com"
+    - shop.example.com
   gateways:
-    - ecommerce/frontendproxy-gateway
+    - frontendproxy-gateway
   http:
     - match:
         - uri:
