@@ -1,0 +1,25 @@
+# config.yml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+
+name: cka-cluster1
+
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      - containerPort: 80    # Inside the cluster (NodePort or Service)
+        hostPort: 80         # On your local machine
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 443
+        protocol: TCP
+      - containerPort: 30000
+        hostPort: 30000
+        protocol: TCP
+      - containerPort: 30001
+        hostPort: 30001
+        protocol: TCP
+  - role: worker
+  - role: worker
+
+
