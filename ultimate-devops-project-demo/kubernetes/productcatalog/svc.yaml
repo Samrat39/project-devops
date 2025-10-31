@@ -19,6 +19,7 @@ spec:
       port: 8088
       protocol: TCP
       targetPort: 8088
+      nodePort: 30001
   selector:
     
     opentelemetry.io/name: opentelemetry-demo-productcatalogservice
