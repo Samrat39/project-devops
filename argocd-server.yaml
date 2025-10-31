@@ -12,8 +12,8 @@ spec:
     - name: http
       port: 80
       targetPort: 8080
-      nodePort: 30081
+      nodePort: 30002
     - name: https
       port: 443
       targetPort: 8080
-      nodePort: 30083
+      nodePort: 30003

@@ -16,9 +16,9 @@ spec:
   type: NodePort
   ports:
     - name: http-service
-      port: 8088
+      port: 8081
       protocol: TCP
-      targetPort: 8088
+      targetPort: 8081
       nodePort: 30001
   selector:
     
