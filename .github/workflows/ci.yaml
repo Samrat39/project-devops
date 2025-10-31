@@ -103,7 +103,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update Image Tag in Deployment Manifest
         run: |
@@ -112,7 +112,7 @@ jobs:
 
       - name: Commit and Push to CI Branch
         env:
-          TOKEN: ${{ secrets.PAT_TOKEN }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name "Manoj choudhry"
           git config --global user.email "manojsamrat32@gmail.com"
