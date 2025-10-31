@@ -5,8 +5,8 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - 'ultimate-devops-project-demo/kubernetes/**/deploy.yaml'
+    #paths-ignore:
+     # - 'ultimate-devops-project-demo/kubernetes/**/deploy.yaml'
   pull_request:
     branches:
       - main
