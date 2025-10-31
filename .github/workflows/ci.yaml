@@ -1,6 +1,7 @@
 name: microservices-ci
 
 on:
+
   push:
     branches:
       - main
@@ -9,6 +10,8 @@ on:
   pull_request:
     branches:
       - main
+permissions:
+   contents: write
 
 jobs:
   build-test:
