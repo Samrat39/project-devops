@@ -120,10 +120,10 @@ jobs:
           git config --global user.name "Manoj choudhry"
           git config --global user.email "manojsamrat32@gmail.com"
 
-          # Dedicated CI branch per service
-          CI_BRANCH="ci/${{ matrix.service }}"
 
-          git checkout -B "${CI_BRANCH}"
+          git checkout main
+          git pull origin main
           git add ultimate-devops-project-demo/kubernetes/${{ matrix.service }}/deploy.yaml
           git commit -m "Update ${{ matrix.service }} image tag [skip-ci]" || echo "No changes to commit"
-          git push origin "${CI_BRANCH}" --force
+          git push origin main
+
