@@ -101,7 +101,7 @@ jobs:
     needs: docker
     strategy:
       matrix:
-        service: [productcatalog, frontendproxy]
+        service: [productcatalog, frontendproxy, frontend, cart, shipping, payment, checkout, ad, currency, email, flagd]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
