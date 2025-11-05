@@ -8,9 +8,11 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/fs"
 	"net"
+	"net/http"
 	"os"
 	"os/signal"
 	"strings"
@@ -18,7 +20,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
+	"github.com/soheilhy/cmux"
 
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/contrib/instrumentation/runtime"
@@ -117,7 +121,6 @@ func main() {
 		if err := tp.Shutdown(context.Background()); err != nil {
 			log.Fatalf("Tracer Provider Shutdown: %v", err)
 		}
-		log.Println("Shutdown tracer provider")
 	}()
 
 	mp := initMeterProvider()
@@ -125,16 +128,14 @@ func main() {
 		if err := mp.Shutdown(context.Background()); err != nil {
 			log.Fatalf("Error shutting down meter provider: %v", err)
 		}
-		log.Println("Shutdown meter provider")
 	}()
+
 	openfeature.AddHooks(otelhooks.NewTracesHook())
-	err := openfeature.SetProvider(flagd.NewProvider())
-	if err != nil {
+	if err := openfeature.SetProvider(flagd.NewProvider()); err != nil {
 		log.Fatal(err)
 	}
 
-	err = runtime.Start(runtime.WithMinimumReadMemStatsInterval(time.Second))
-	if err != nil {
+	if err := runtime.Start(runtime.WithMinimumReadMemStatsInterval(time.Second)); err != nil {
 		log.Fatal(err)
 	}
 
@@ -142,44 +143,81 @@ func main() {
 	var port string
 	mustMapEnv(&port, "PRODUCT_CATALOG_PORT")
 
-	log.Infof("Product Catalog gRPC server started on port: %s", port)
-
 	ln, err := net.Listen("tcp", fmt.Sprintf(":%s", port))
 	if err != nil {
 		log.Fatalf("TCP Listen: %v", err)
 	}
 
-	srv := grpc.NewServer(
+	// cmux to serve REST + gRPC on same port
+	m := cmux.New(ln)
+	grpcL := m.Match(cmux.HTTP2())
+	httpL := m.Match(cmux.HTTP1Fast())
+
+	// gRPC server
+	grpcSrv := grpc.NewServer(
 		grpc.StatsHandler(otelgrpc.NewServerHandler()),
 	)
+	reflection.Register(grpcSrv)
+	pb.RegisterProductCatalogServiceServer(grpcSrv, svc)
+	healthpb.RegisterHealthServer(grpcSrv, svc)
 
-	reflection.Register(srv)
-
-	pb.RegisterProductCatalogServiceServer(srv, svc)
-	healthpb.RegisterHealthServer(srv, svc)
+	// HTTP REST routes
+	r := mux.NewRouter()
+	r.HandleFunc("/api/products", handleListProducts).Methods(http.MethodGet)
+	r.HandleFunc("/api/products/{id}", handleGetProduct).Methods(http.MethodGet)
+	httpSrv := &http.Server{Handler: r}
 
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGKILL)
 	defer cancel()
 
 	go func() {
-		if err := srv.Serve(ln); err != nil {
-			log.Fatalf("Failed to serve gRPC server, err: %v", err)
+		log.Infof("Product Catalog gRPC server started on port: %s", port)
+		if err := grpcSrv.Serve(grpcL); err != nil && err != cmux.ErrListenerClosed {
+			log.Fatalf("gRPC Serve: %v", err)
+		}
+	}()
+	go func() {
+		log.Infof("Product Catalog HTTP server started on port: %s", port)
+		if err := httpSrv.Serve(httpL); err != nil && err != http.ErrServerClosed && err != cmux.ErrListenerClosed {
+			log.Fatalf("HTTP Serve: %v", err)
+		}
+	}()
+
+	go func() {
+		if err := m.Serve(); err != nil && err != cmux.ErrListenerClosed {
+			log.Fatalf("cmux Serve: %v", err)
 		}
 	}()
 
 	<-ctx.Done()
-
-	srv.GracefulStop()
-	log.Println("Product Catalog gRPC server stopped")
+	_ = httpSrv.Shutdown(context.Background())
+	grpcSrv.GracefulStop()
+	log.Println("Product Catalog servers stopped")
 }
 
-type productCatalog struct {
-	pb.UnimplementedProductCatalogServiceServer
+func handleListProducts(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	resp := struct {
+		Products []*pb.Product `json:"products"`
+	}{Products: catalog}
+	_ = json.NewEncoder(w).Encode(resp)
+}
+
+func handleGetProduct(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	id := mux.Vars(r)["id"]
+
+	for _, p := range catalog {
+		if p.Id == id {
+			_ = json.NewEncoder(w).Encode(p)
+			return
+		}
+	}
+
+	http.Error(w, `{"error":"not found"}`, http.StatusNotFound)
 }
 
 func readProductFiles() ([]*pb.Product, error) {
-
-	// find all .json files in the products directory
 	entries, err := os.ReadDir("./products")
 	if err != nil {
 		return nil, err
@@ -196,8 +234,6 @@ func readProductFiles() ([]*pb.Product, error) {
 		}
 	}
 
-	// read the contents of each .json file and unmarshal into a ListProductsResponse
-	// then append the products to the catalog
 	var products []*pb.Product
 	for _, f := range jsonFiles {
 		jsonData, err := os.ReadFile("./products/" + f.Name())
@@ -214,7 +250,6 @@ func readProductFiles() ([]*pb.Product, error) {
 	}
 
 	log.Infof("Loaded %d products", len(products))
-
 	return products, nil
 }
 
@@ -224,6 +259,10 @@ func mustMapEnv(target *string, key string) {
 		log.Fatalf("Environment Variable Not Set: %q", key)
 	}
 	*target = value
+}
+
+type productCatalog struct {
+	pb.UnimplementedProductCatalogServiceServer
 }
 
 func (p *productCatalog) Check(ctx context.Context, req *healthpb.HealthCheckRequest) (*healthpb.HealthCheckResponse, error) {
@@ -236,26 +275,13 @@ func (p *productCatalog) Watch(req *healthpb.HealthCheckRequest, ws healthpb.Hea
 
 func (p *productCatalog) ListProducts(ctx context.Context, req *pb.Empty) (*pb.ListProductsResponse, error) {
 	span := trace.SpanFromContext(ctx)
-
-	span.SetAttributes(
-		attribute.Int("app.products.count", len(catalog)),
-	)
+	span.SetAttributes(attribute.Int("app.products.count", len(catalog)))
 	return &pb.ListProductsResponse{Products: catalog}, nil
 }
 
 func (p *productCatalog) GetProduct(ctx context.Context, req *pb.GetProductRequest) (*pb.Product, error) {
 	span := trace.SpanFromContext(ctx)
-	span.SetAttributes(
-		attribute.String("app.product.id", req.Id),
-	)
-
-	// GetProduct will fail on a specific product when feature flag is enabled
-	if p.checkProductFailure(ctx, req.Id) {
-		msg := "Error: Product Catalog Fail Feature Flag Enabled"
-		span.SetStatus(otelcodes.Error, msg)
-		span.AddEvent(msg)
-		return nil, status.Errorf(codes.Internal, msg)
-	}
+	span.SetAttributes(attribute.String("app.product.id", req.Id))
 
 	var found *pb.Product
 	for _, product := range catalog {
@@ -272,38 +298,5 @@ func (p *productCatalog) GetProduct(ctx context.Context, req *pb.GetProductReque
 		return nil, status.Errorf(codes.NotFound, msg)
 	}
 
-	msg := fmt.Sprintf("Product Found - ID: %s, Name: %s", req.Id, found.Name)
-	span.AddEvent(msg)
-	span.SetAttributes(
-		attribute.String("app.product.name", found.Name),
-	)
 	return found, nil
-}
-
-func (p *productCatalog) SearchProducts(ctx context.Context, req *pb.SearchProductsRequest) (*pb.SearchProductsResponse, error) {
-	span := trace.SpanFromContext(ctx)
-
-	var result []*pb.Product
-	for _, product := range catalog {
-		if strings.Contains(strings.ToLower(product.Name), strings.ToLower(req.Query)) ||
-			strings.Contains(strings.ToLower(product.Description), strings.ToLower(req.Query)) {
-			result = append(result, product)
-		}
-	}
-	span.SetAttributes(
-		attribute.Int("app.products_search.count", len(result)),
-	)
-	return &pb.SearchProductsResponse{Results: result}, nil
-}
-
-func (p *productCatalog) checkProductFailure(ctx context.Context, id string) bool {
-	if id != "OLJCESPC7Z" {
-		return false
-	}
-
-	client := openfeature.NewClient("productCatalog")
-	failureEnabled, _ := client.BooleanValue(
-		ctx, "productCatalogFailure", false, openfeature.EvaluationContext{},
-	)
-	return failureEnabled
 }

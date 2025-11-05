@@ -17,26 +17,25 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [productcatalog, frontendproxy, frontend, cart, shipping, payment, checkout, ad, currency, email, flagd]
+        service: [productcatalog]   # Only productcatalog has Go code
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Go 1.22
-        if: ${{ matrix.service == 'productcatalog' }}
         uses: actions/setup-go@v4
         with:
           go-version: '1.22'
 
       - name: Download Dependencies & Build
-        if: ${{ matrix.service == 'productcatalog' }}
         run: |
           cd ultimate-devops-project-demo/src/${{ matrix.service }}
-          go mod download
+          go mod tidy
+          go get github.com/soheilhy/cmux@v0.1.5
+          go get github.com/gorilla/mux@v1.8.1
           go build -o ${{ matrix.service }}-service main.go
 
       - name: Run Unit Tests
-        if: ${{ matrix.service == 'productcatalog' }}
         run: |
           cd ultimate-devops-project-demo/src/${{ matrix.service }}
           go test ./...
@@ -46,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [productcatalog]
+        service: [productcatalog]  # Only lint productcatalog source
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -70,10 +69,19 @@ jobs:
     needs: build-test
     strategy:
       matrix:
-        service: [productcatalog, frontendproxy]   # Only build images for these
+        service: [productcatalog, frontendproxy]   # Only build these images
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      # Install Go Dependencies only for productcatalog before image build
+      - name: Install Go Dependencies (only for productcatalog)
+      if: ${{ matrix.service == 'productcatalog' }}
+        run: |
+          cd ultimate-devops-project-demo/src/productcatalog
+          go mod tidy
+          go get github.com/soheilhy/cmux@v0.1.5
+          go get github.com/gorilla/mux@v1.8.1
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -113,11 +121,9 @@ jobs:
       - name: Commit and Push Updated Manifest
         run: |
           git config --global user.name "Manoj choudhry"
-          git stash || echo "Nothing to stash"
+          git config --global user.email "manojsamrat32@gmail.com"
 
-          git pull --rebase origin main
-
-          git stash pop || echo "Nothing to apply"
+          git pull --rebase origin main || true
 
           git add ultimate-devops-project-demo/kubernetes/*
           git commit -m "Update image tags to run ${{ github.run_id }} [skip-ci]" || echo "No changes to commit"
