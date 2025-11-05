@@ -113,9 +113,12 @@ jobs:
       - name: Commit and Push Updated Manifest
         run: |
           git config --global user.name "Manoj choudhry"
-          git config --global user.email "manojsamrat32@gmail.com"
+          git stash || echo "Nothing to stash"
+
           git pull --rebase origin main
+
+          git stash pop || echo "Nothing to apply"
+
           git add ultimate-devops-project-demo/kubernetes/*
           git commit -m "Update image tags to run ${{ github.run_id }} [skip-ci]" || echo "No changes to commit"
           git push origin main
-
