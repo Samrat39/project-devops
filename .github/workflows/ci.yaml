@@ -1,17 +1,15 @@
 name: microservices-ci
 
 on:
-
   push:
     branches:
       - main
-    #paths-ignore:
-     # - 'ultimate-devops-project-demo/kubernetes/**/deploy.yaml'
   pull_request:
     branches:
       - main
+
 permissions:
-   contents: write
+  contents: write
 
 jobs:
   build-test:
@@ -48,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [productcatalog, frontendproxy, frontend, cart, shipping, payment, checkout, ad, currency, email, flagd]
+        service: [productcatalog]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -60,7 +58,6 @@ jobs:
           cache-dependency-path: ultimate-devops-project-demo/src/${{ matrix.service }}/go.sum
 
       - name: Run golangci-lint
-        if: ${{ matrix.service == 'product-catalog' }}
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.55.2
@@ -73,7 +70,7 @@ jobs:
     needs: build-test
     strategy:
       matrix:
-        service: [productcatalog, frontendproxy]
+        service: [productcatalog, frontendproxy]   # Only build images for these
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -101,7 +98,7 @@ jobs:
     needs: docker
     strategy:
       matrix:
-        service: [productcatalog, frontendproxy, frontend, cart, shipping, payment, checkout, ad, currency, email, flagd]
+        service: [productcatalog, frontendproxy]   # Update only those with images built
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -113,17 +110,12 @@ jobs:
           sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:${{ github.run_id }}|" \
           ultimate-devops-project-demo/kubernetes/${{ matrix.service }}/deploy.yaml
 
-      - name: Commit and Push to CI Branch
-        env:
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Commit and Push Updated Manifest
         run: |
           git config --global user.name "Manoj choudhry"
           git config --global user.email "manojsamrat32@gmail.com"
 
-
-          git checkout main
-          git pull origin main
+          git pull --rebase origin main
           git add ultimate-devops-project-demo/kubernetes/${{ matrix.service }}/deploy.yaml
           git commit -m "Update ${{ matrix.service }} image tag [skip-ci]" || echo "No changes to commit"
           git push origin main
-
