@@ -71,6 +71,6 @@ spec:
           - -c
           - until nc -z -v -w30 opentelemetry-demo-valkey 6379; do echo waiting
             for valkey; sleep 2; done;
-          image: samrat320/cart:18995988897
+          image: busybox:latest
           name: wait-for-valkey
       volumes:
