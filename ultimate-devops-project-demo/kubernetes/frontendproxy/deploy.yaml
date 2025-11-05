@@ -5,7 +5,6 @@ kind: Deployment
 metadata:
   name: opentelemetry-demo-frontendproxy
   labels:
-    
     opentelemetry.io/name: opentelemetry-demo-frontendproxy
     app.kubernetes.io/instance: opentelemetry-demo
     app.kubernetes.io/component: frontendproxy
@@ -17,12 +16,10 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      
       opentelemetry.io/name: opentelemetry-demo-frontendproxy
   template:
     metadata:
       labels:
-        
         opentelemetry.io/name: opentelemetry-demo-frontendproxy
         app.kubernetes.io/instance: opentelemetry-demo
         app.kubernetes.io/component: frontendproxy
@@ -31,15 +28,21 @@ spec:
       serviceAccountName: opentelemetry-demo
       containers:
         - name: frontendproxy
-
           image: samrat320/frontendproxy:19103452468
-
           imagePullPolicy: IfNotPresent
           ports:
-            
             - containerPort: 8080
               name: service
           env:
+            # ========== PRODUCT CATALOG REST CONFIG (ADDED) ==========
+            - name: PRODUCT_CATALOG_HOST
+              value: "opentelemetry-demo-productcatalogservice"
+            - name: PRODUCT_CATALOG_PORT
+              value: "8088"
+            - name: PRODUCT_CATALOG_ENDPOINT
+              value: "/api/products"
+            # =========================================================
+
             - name: OTEL_SERVICE_NAME
               valueFrom:
                 fieldRef:
