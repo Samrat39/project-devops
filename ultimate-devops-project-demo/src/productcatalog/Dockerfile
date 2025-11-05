@@ -1,31 +1,35 @@
-FROM golang:1.22-alpine AS builder
+FROM golang:1.22-alpine AS build
 
-WORKDIR /usr/src/app/
+WORKDIR /app
 
-# Use Go build cache for dependencies
+# Use Go build cache
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     mkdir -p /root/.cache/go-build
 
-# Copy
 COPY go.mod go.sum ./
-
-# Download
 RUN go mod download
 
 # Copy the rest of the source code
 COPY . .
 
-RUN go build -o product-catalog .
+# Build ONLY the HTTP main file
+RUN go build -o productcatalog main.go
 
 ####################################
 
-FROM alpine AS release
+FROM alpine:3.19
 
-WORKDIR /usr/src/app/
+WORKDIR /app
 
-COPY ./products/ ./products/
-COPY --from=builder /usr/src/app/product-catalog/ ./
+# Copy products.json to working directory
+COPY products/products.json /app/products.json
 
-ENV PRODUCT_CATALOG_PORT 8088
-ENTRYPOINT [ "./product-catalog" ]
+# Copy built binary
+COPY --from=builder /app/productcatalog /app/productcatalog
+
+EXPOSE 8088
+
+ENV PRODUCT_CATALOG_SERVICE_PORT=8088
+
+ENTRYPOINT ["./productcatalog"]
