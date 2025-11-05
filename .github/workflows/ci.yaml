@@ -56,6 +56,12 @@ jobs:
           go-version: '1.22'
           cache-dependency-path: ultimate-devops-project-demo/src/${{ matrix.service }}/go.sum
 
+      - name: Download Go Dependencies
+        run: |
+          cd ultimate-devops-project-demo/src/${{ matrix.service }}
+          go mod tidy
+          go mod download
+
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
