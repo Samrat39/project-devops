@@ -116,4 +116,5 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add ultimate-devops-project-demo/kubernetes/${{ matrix.service }}/deploy.yaml
           git commit -m "Update ${{ matrix.service }} image to ${{ secrets.DOCKER_USERNAME }}/${{ matrix.service }}:${{ github.run_id }}"
-          git push origin main
+          git push --force-with-lease origin main
+
