@@ -15,10 +15,10 @@ FROM alpine:3.19
 
 WORKDIR /app
 
-# Copy products.json
-COPY products/products.json /app/products.json
+# Copy products folder (not only file)
+COPY products/ /app/products/
 
-# Copy binary from builder stage
+# Copy binary
 COPY --from=builder /app/productcatalog /app/productcatalog
 
 EXPOSE 8088
