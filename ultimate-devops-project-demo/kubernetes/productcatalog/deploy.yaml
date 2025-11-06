@@ -34,7 +34,7 @@ spec:
 
 
 
-          image: samrat320/productcatalog:19107748339
+          image: ghcr.io/open-telemetry/demo:1.12.0-productcatalogservice
 
 
           imagePullPolicy: IfNotPresent
