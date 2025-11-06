@@ -195,12 +195,10 @@ func main() {
 	log.Println("Product Catalog servers stopped")
 }
 
+// ✅ Return a pure JSON array so frontend reads it directly
 func handleListProducts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	resp := struct {
-		Products []*pb.Product `json:"products"`
-	}{Products: catalog}
-	_ = json.NewEncoder(w).Encode(resp)
+	_ = json.NewEncoder(w).Encode(catalog)
 }
 
 func handleGetProduct(w http.ResponseWriter, r *http.Request) {
