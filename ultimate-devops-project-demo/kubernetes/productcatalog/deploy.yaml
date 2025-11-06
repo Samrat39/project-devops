@@ -35,9 +35,9 @@ spec:
 
 
 <<<<<<< HEAD
-          image: ghcr.io/open-telemetry/demo:1.12.0-productcatalogservice
+          image: samrat320/productcatalog:19141402428
 =======
-          image: samrat320/productcatalog:19108421434
+          image: samrat320/productcatalog:19141402428
 >>>>>>> 1a4c1e005b4fe7a813bfb633e802eac62b0ef237
 
 
