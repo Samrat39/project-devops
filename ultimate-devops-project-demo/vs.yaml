@@ -11,6 +11,6 @@ spec:
   http:
   - route:
     - destination:
-        host: opentelemetry-demo-frontend
+        host: opentelemetry-demo-frontendproxy
         port:
           number: 8080
