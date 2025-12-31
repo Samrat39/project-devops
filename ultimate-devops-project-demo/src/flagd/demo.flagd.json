@@ -11,7 +11,7 @@
       "defaultVariant": "on"
     },
     
-    "hotproducts": {
+    "hotProducts": {
       "description": "Show hot products section in frontend",
       "state": "ENABLED",
       "variants": {
