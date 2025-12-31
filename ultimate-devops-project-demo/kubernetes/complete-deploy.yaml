@@ -1810,7 +1810,7 @@ data:
             "on": true,
             "off": false
           },
-          "defaultVariant": "off"
+          "defaultVariant": "on"
         },
         "recommendationServiceCacheFailure": {
           "description": "Fail recommendation service cache",
@@ -1819,7 +1819,7 @@ data:
             "on": true,
             "off": false
           },
-          "defaultVariant": "off"
+          "defaultVariant": "on"
         },
         "adServiceManualGc": {
           "description": "Triggers full manual garbage collections in the ad service",
@@ -1828,7 +1828,7 @@ data:
             "on": true,
             "off": false
           },
-          "defaultVariant": "off"
+          "defaultVariant": "on"
         },
         "adServiceHighCpu": {
           "description": "Triggers high cpu load in the ad service",
@@ -1837,7 +1837,7 @@ data:
             "on": true,
             "off": false
           },
-          "defaultVariant": "off"
+          "defaultVariant": "on"
         },
         "adServiceFailure": {
           "description": "Fail ad service",
@@ -1846,7 +1846,7 @@ data:
             "on": true,
             "off": false
           },
-          "defaultVariant": "off"
+          "defaultVariant": "on"
         },
         "kafkaQueueProblems": {
           "description": "Overloads Kafka queue while simultaneously introducing a consumer side delay leading to a lag spike",
@@ -1855,7 +1855,7 @@ data:
             "on": 100,
             "off": 0
           },
-          "defaultVariant": "off"
+          "defaultVariant": "on"
         },
         "cartServiceFailure": {
           "description": "Fail cart service",
@@ -1864,7 +1864,7 @@ data:
             "on": true,
             "off": false
           },
-          "defaultVariant": "off"
+          "defaultVariant": "on"
         },
         "paymentServiceFailure": {
           "description": "Fail payment service charge requests",
@@ -1873,7 +1873,7 @@ data:
             "on": true,
             "off": false
           },
-          "defaultVariant": "off"
+          "defaultVariant": "on"
         },
         "paymentServiceUnreachable": {
           "description": "Payment service is unavailable",
@@ -1882,7 +1882,7 @@ data:
             "on": true,
             "off": false
           },
-          "defaultVariant": "off"
+          "defaultVariant": "on"
         },
         "loadgeneratorFloodHomepage": {
           "description": "Flood the frontend with a large amount of requests.",
@@ -1891,7 +1891,7 @@ data:
             "on": 100,
             "off": 0
           },
-          "defaultVariant": "off"
+          "defaultVariant": "on"
         },
         "imageSlowLoad": {
           "description": "slow loading images in the frontend",
@@ -1901,7 +1901,7 @@ data:
             "5sec": 5000,
             "off": 0
           },
-          "defaultVariant": "off"
+          "defaultVariant": "on"
         }
       }
     }

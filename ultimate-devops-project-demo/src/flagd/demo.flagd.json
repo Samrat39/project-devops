@@ -8,7 +8,7 @@
         "on": true,
         "off": false
       },
-      "defaultVariant": "off"
+      "defaultVariant": "on"
     },
     "recommendationCacheFailure": {
       "description": "Fail recommendation service cache",
@@ -17,7 +17,7 @@
         "on": true,
         "off": false
       },
-      "defaultVariant": "off"
+      "defaultVariant": "on"
     },
     "adManualGc": {
       "description": "Triggers full manual garbage collections in the ad service",
@@ -26,7 +26,7 @@
         "on": true,
         "off": false
       },
-      "defaultVariant": "off"
+      "defaultVariant": "on"
     },
     "adHighCpu": {
       "description": "Triggers high cpu load in the ad service",
@@ -35,7 +35,7 @@
         "on": true,
         "off": false
       },
-      "defaultVariant": "off"
+      "defaultVariant": "on"
     },
     "adFailure": {
       "description": "Fail ad service",
@@ -44,7 +44,7 @@
         "on": true,
         "off": false
       },
-      "defaultVariant": "off"
+      "defaultVariant": "on"
     },
     "kafkaQueueProblems": {
       "description": "Overloads Kafka queue while simultaneously introducing a consumer side delay leading to a lag spike",
@@ -53,7 +53,7 @@
         "on": 100,
         "off": 0
       },
-      "defaultVariant": "off"
+      "defaultVariant": "on"
     },
     "cartFailure": {
       "description": "Fail cart service",
@@ -62,7 +62,7 @@
         "on": true,
         "off": false
       },
-      "defaultVariant": "off"
+      "defaultVariant": "on"
     },
     "paymentFailure": {
       "description": "Fail payment service charge requests n%",
@@ -76,7 +76,7 @@
         "10%": 0.1,
         "off": 0
       },
-      "defaultVariant": "off"
+      "defaultVariant": "on"
     },
     "paymentUnreachable": {
       "description": "Payment service is unavailable",
@@ -85,7 +85,7 @@
         "on": true,
         "off": false
       },
-      "defaultVariant": "off"
+      "defaultVariant": "on"
     },
     "loadGeneratorFloodHomepage": {
       "description": "Flood the frontend with a large amount of requests.",
@@ -94,7 +94,7 @@
         "on": 100,
         "off": 0
       },
-      "defaultVariant": "off"
+      "defaultVariant": "on"
     },
     "imageSlowLoad": {
       "description": "slow loading images in the frontend",
@@ -104,7 +104,7 @@
         "5sec": 5000,
         "off": 0
       },
-      "defaultVariant": "off"
+      "defaultVariant": "on"
     }
   }
 }

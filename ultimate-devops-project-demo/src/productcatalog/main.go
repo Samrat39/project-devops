@@ -32,8 +32,6 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
-/* ---------------- GLOBALS ---------------- */
-
 var (
 	log               = logrus.New()
 	catalog           []*pb.Product
@@ -47,7 +45,7 @@ func init() {
 	var err error
 	catalog, err = readProductFiles()
 	if err != nil {
-		log.Fatalf("Failed to read products: %v", err)
+		log.Fatalf("failed to read products: %v", err)
 	}
 }
 
@@ -78,7 +76,11 @@ func initTracer() *sdktrace.TracerProvider {
 
 func main() {
 	tp := initTracer()
-	defer tp.Shutdown(context.Background())
+	defer func() {
+		if err := tp.Shutdown(context.Background()); err != nil {
+			log.Errorf("tracer shutdown failed: %v", err)
+		}
+	}()
 
 	var port string
 	mustMapEnv(&port, "PRODUCT_CATALOG_PORT")
@@ -110,16 +112,33 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	go grpcSrv.Serve(grpcL)
-	go httpSrv.Serve(httpL)
-	go m.Serve()
+	go func() {
+		if err := grpcSrv.Serve(grpcL); err != nil {
+			log.Errorf("grpc serve failed: %v", err)
+		}
+	}()
+
+	go func() {
+		if err := httpSrv.Serve(httpL); err != nil && err != http.ErrServerClosed {
+			log.Errorf("http serve failed: %v", err)
+		}
+	}()
+
+	go func() {
+		if err := m.Serve(); err != nil {
+			log.Errorf("cmux serve failed: %v", err)
+		}
+	}()
 
 	<-ctx.Done()
-	httpSrv.Shutdown(context.Background())
+
+	if err := httpSrv.Shutdown(context.Background()); err != nil {
+		log.Errorf("http shutdown failed: %v", err)
+	}
 	grpcSrv.GracefulStop()
 }
 
-/* ---------------- REST (FIXED CONTRACT) ---------------- */
+/* ---------------- REST ---------------- */
 
 type ProductListResponse struct {
 	Products []*pb.Product `json:"products"`
@@ -127,7 +146,11 @@ type ProductListResponse struct {
 
 func handleListProducts(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(ProductListResponse{Products: catalog})
+	if err := json.NewEncoder(w).Encode(
+		ProductListResponse{Products: catalog},
+	); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func handleGetProduct(w http.ResponseWriter, r *http.Request) {
@@ -136,9 +159,11 @@ func handleGetProduct(w http.ResponseWriter, r *http.Request) {
 
 	for _, p := range catalog {
 		if p.Id == id {
-			json.NewEncoder(w).Encode(map[string]*pb.Product{
-				"product": p,
-			})
+			if err := json.NewEncoder(w).Encode(
+				map[string]*pb.Product{"product": p},
+			); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
 			return
 		}
 	}
@@ -173,7 +198,7 @@ func (p *productCatalog) GetProduct(
 	return nil, status.Errorf(codes.NotFound, "product not found")
 }
 
-/* ---------------- HEALTH (FIX) ---------------- */
+/* ---------------- HEALTH ---------------- */
 
 func (p *productCatalog) Check(
 	context.Context,
@@ -197,7 +222,7 @@ func mustMapEnv(target *string, key string) {
 	if v, ok := os.LookupEnv(key); ok {
 		*target = v
 	} else {
-		log.Fatalf("Missing env var: %s", key)
+		log.Fatalf("missing env var: %s", key)
 	}
 }
 
@@ -210,12 +235,19 @@ func readProductFiles() ([]*pb.Product, error) {
 	var products []*pb.Product
 	for _, entry := range entries {
 		if strings.HasSuffix(entry.Name(), ".json") {
-			data, _ := os.ReadFile("./products/" + entry.Name())
+			data, err := os.ReadFile("./products/" + entry.Name())
+			if err != nil {
+				return nil, err
+			}
+
 			var res pb.ListProductsResponse
-			protojson.Unmarshal(data, &res)
+			if err := protojson.Unmarshal(data, &res); err != nil {
+				return nil, err
+			}
 			products = append(products, res.Products...)
 		}
 	}
+
 	log.Infof("Loaded %d products", len(products))
 	return products, nil
 }
