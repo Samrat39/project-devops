@@ -55,10 +55,7 @@ func init() {
 
 func initResource() *sdkresource.Resource {
 	initResourcesOnce.Do(func() {
-		resource, _ = sdkresource.Merge(
-			sdkresource.Default(),
-			sdkresource.NewWithAttributes(),
-		)
+		resource = sdkresource.Default()
 	})
 	return resource
 }
