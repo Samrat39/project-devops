@@ -10,6 +10,18 @@
       },
       "defaultVariant": "on"
     },
+    
+    "hot-products": {
+      "description": "Show hot products section in frontend",
+      "state": "ENABLED",
+      "variants": {
+        "on": true,
+        "off": false
+     },
+     "defaultVariant": "on"
+  },
+
+  
     "recommendationCacheFailure": {
       "description": "Fail recommendation service cache",
       "state": "ENABLED",
@@ -108,3 +120,4 @@
     }
   }
 }
+
