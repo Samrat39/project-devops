@@ -5,4 +5,7 @@ image:
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
+service:
+  port: 8080
+
 
