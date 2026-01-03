@@ -1,78 +1,66 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "productcatalog.fullname" . }}
+  name: opentelemetry-demo-productcatalogservice
   labels:
-    {{- include "productcatalog.labels" . | nindent 4 }}
+    opentelemetry.io/name: opentelemetry-demo-productcatalogservice
+    app.kubernetes.io/instance: opentelemetry-demo
+    app.kubernetes.io/component: productcatalogservice
+    app.kubernetes.io/name: opentelemetry-demo-productcatalogservice
+    app.kubernetes.io/version: "1.12.0"
+    app.kubernetes.io/part-of: opentelemetry-demo
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
+  replicas: 1
+  revisionHistoryLimit: 5
   selector:
     matchLabels:
-      {{- include "productcatalog.selectorLabels" . | nindent 6 }}
+      opentelemetry.io/name: opentelemetry-demo-productcatalogservice
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       labels:
-        {{- include "productcatalog.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        opentelemetry.io/name: opentelemetry-demo-productcatalogservice
+        app.kubernetes.io/instance: opentelemetry-demo
+        app.kubernetes.io/component: productcatalogservice
+        app.kubernetes.io/name: opentelemetry-demo-productcatalogservice
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      serviceAccountName: {{ include "productcatalog.serviceAccountName" . }}
-      {{- with .Values.podSecurityContext }}
-      securityContext:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      serviceAccountName: opentelemetry-demo
       containers:
-        - name: {{ .Chart.Name }}
-          {{- with .Values.securityContext }}
-          securityContext:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+        - name: productcatalogservice
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.global.imagePullPolicy }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
-          {{- with .Values.livenessProbe }}
-          livenessProbe:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.readinessProbe }}
-          readinessProbe:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.resources }}
+            - containerPort: 8088
+              name: service
+          env:
+            - name: ENV
+              value: {{ .Values.global.env | quote }}
+
+            - name: OTEL_SERVICE_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.labels['app.kubernetes.io/component']
+
+            - name: OTEL_COLLECTOR_NAME
+              value: "opentelemetry-demo-otelcol"
+
+            - name: OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
+              value: cumulative
+
+            - name: PRODUCT_CATALOG_PORT
+              value: "8088"
+
+            - name: FLAGD_HOST
+              value: "opentelemetry-demo-flagd"
+
+            - name: FLAGD_PORT
+              value: "8013"
+
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://$(OTEL_COLLECTOR_NAME):4317
+
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: service.name=$(OTEL_SERVICE_NAME),service.namespace=opentelemetry-demo,service.version=1.12.0
           resources:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- with .Values.volumeMounts }}
-          volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-      {{- with .Values.volumes }}
-      volumes:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+            limits:
+              memory: 50Mi
