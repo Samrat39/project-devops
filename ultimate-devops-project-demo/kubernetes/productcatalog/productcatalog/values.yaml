@@ -1,6 +1,6 @@
 image:
   repository: "samrat320/productcatalog"
-  tag: "3d594e0e3650fae3265dbbb4b18c1f35d08b69a9"
+  tag: "f2c66d76ae0806c2bdaf49680f6bedf363b398b3"
 
 imagePullSecrets: []
 nameOverride: ""
