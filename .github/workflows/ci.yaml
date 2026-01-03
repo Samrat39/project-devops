@@ -82,7 +82,8 @@ jobs:
       - name: Update image tag (DEV)
         run: |
           for service in productcatalog frontendproxy; do
-            sed -i "s/tag:.*/tag: \"${{ github.sha }}\"/" apps/$service/values.yaml
+            sed -i "s/tag:.*/tag: \"${{ github.sha }}\"/" \
+            $service/$service/values.yaml
           done
 
       - name: Commit DEV
@@ -90,7 +91,7 @@ jobs:
           git config user.name "ci-bot"
           git config user.email "ci@bot.com"
           git pull --rebase origin main || true
-          git add apps/*/values.yaml
+          git add productcatalog/productcatalog/values.yaml frontendproxy/frontendproxy/values.yaml
           git commit -m "dev: deploy ${{ github.sha }} [skip-ci]" || echo "No changes"
           git push
 
@@ -151,7 +152,7 @@ jobs:
           git push
 
 # ------------------------------------------------
-# 6️⃣ PROMOTE TO PROD (MANUAL)
+# 6️⃣ PROMOTE TO PROD (MANUAL APPROVAL)
 # ------------------------------------------------
   promote-prod:
     if: ${{ !contains(github.event.head_commit.message, '[skip-ci]') }}
