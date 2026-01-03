@@ -118,7 +118,7 @@ jobs:
 
       - name: Promote to STAGING
         run: |
-          sed -i "s/tag:.*/tag: \"${{ github.sha }}\"/" env/value-staging.yaml
+          sed -i "s/tag:.*/tag: \"${{ github.sha }}\"/" env/values.yaml
 
       - name: Commit STAGING
         run: |
@@ -146,7 +146,7 @@ jobs:
 
       - name: Promote to PROD
         run: |
-          sed -i "s/tag:.*/tag: \"${{ github.sha }}\"/" env/value-prod.yaml
+          sed -i "s/tag:.*/tag: \"${{ github.sha }}\"/" env/values.yaml
 
       - name: Commit PROD
         run: |
