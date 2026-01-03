@@ -105,28 +105,34 @@ jobs:
     if: ${{ !contains(github.event.head_commit.message, '[skip-ci]') }}
     runs-on: ubuntu-latest
     needs: deploy-dev
-    timeout-minutes: 15
+    timeout-minutes: 10
 
     steps:
-      - name: Install Argo CD CLI
+      - name: Wait for services to be healthy
         run: |
-          curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
-          chmod +x argocd
-          sudo mv argocd /usr/local/bin/
+          echo "Checking health of productcatalog service..."
+          for i in {1..10}; do
+            STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://productcatalog.dev.example.com/health)
+            if [ "$STATUS_CODE" -eq 200 ]; then
+              echo "productcatalog service is healthy."
+              break
+            else
+              echo "productcatalog service not healthy yet. Status code: $STATUS_CODE. Retrying in 15 seconds..."
+              sleep 15
+            fi
+          done
 
-      - name: Wait for DEV to be Healthy
-        run: |
-          argocd login $ARGOCD_SERVER \
-            --auth-token $ARGOCD_TOKEN \
-            --insecure
-
-          argocd app wait ecommerce-dev \
-            --sync \
-            --health \
-            --timeout 600
-        env:
-          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
-          ARGOCD_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
+          echo "Checking health of frontendproxy service..."
+          for i in {1..10}; do
+            STATUS_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://frontendproxy.dev.example.com/health)
+            if [ "$STATUS_CODE" -eq 200 ]; then
+              echo "frontendproxy service is healthy."
+              break
+            else
+              echo "frontendproxy service not healthy yet. Status code: $STATUS_CODE. Retrying in 15 seconds..."
+              sleep 15
+            fi
+          done
 
 # ------------------------------------------------
 # 5️⃣ PROMOTE TO STAGING (AUTO)
