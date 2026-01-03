@@ -1,6 +1,6 @@
 image:
   repository: "samrat320/frontend-proxy"
-  tag: "8eab1924be21250220be75a11787738662b25f0d"
+  tag: "52a905e319c27fb4dca925f107fd86d1602acb4d"
 
 imagePullSecrets: []
 nameOverride: ""
