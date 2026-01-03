@@ -1,15 +1,24 @@
+---
+# Source: opentelemetry-demo/templates/component.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "frontendproxy.fullname" . }}
+  name: opentelemetry-demo-frontendproxy
   labels:
-    {{- include "frontendproxy.labels" . | nindent 4 }}
+    
+    opentelemetry.io/name: opentelemetry-demo-frontendproxy
+    app.kubernetes.io/instance: opentelemetry-demo
+    app.kubernetes.io/component: frontendproxy
+    app.kubernetes.io/name: opentelemetry-demo-frontendproxy
+    app.kubernetes.io/version: "1.12.0"
+    app.kubernetes.io/part-of: opentelemetry-demo
 spec:
-  type: {{ .Values.service.type }}
+  type: NodePort
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
+    - port: 8080
       name: http
+      targetPort: 8080
+      nodePort: 30000
   selector:
-    {{- include "frontendproxy.selectorLabels" . | nindent 4 }}
+    
+    opentelemetry.io/name: opentelemetry-demo-frontendproxy

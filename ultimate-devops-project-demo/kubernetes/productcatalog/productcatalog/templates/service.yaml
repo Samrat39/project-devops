@@ -1,15 +1,24 @@
+---
+# Source: opentelemetry-demo/templates/component.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "productcatalog.fullname" . }}
+  name: opentelemetry-demo-productcatalogservice
   labels:
-    {{- include "productcatalog.labels" . | nindent 4 }}
+    
+    opentelemetry.io/name: opentelemetry-demo-productcatalogservice
+    app.kubernetes.io/instance: opentelemetry-demo
+    app.kubernetes.io/component: productcatalogservice
+    app.kubernetes.io/name: opentelemetry-demo-productcatalogservice
+    app.kubernetes.io/version: "1.12.0"
+    app.kubernetes.io/part-of: opentelemetry-demo
 spec:
-  type: {{ .Values.service.type }}
+  type: ClusterIP
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
+    - name: http-service
+      port: 8088
       protocol: TCP
-      name: http
+      targetPort: 8088
   selector:
-    {{- include "productcatalog.selectorLabels" . | nindent 4 }}
+    
+    opentelemetry.io/name: opentelemetry-demo-productcatalogservice
