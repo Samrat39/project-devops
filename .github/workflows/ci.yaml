@@ -83,7 +83,7 @@ jobs:
         run: |
           for service in productcatalog frontendproxy; do
             sed -i "s/tag:.*/tag: \"${{ github.sha }}\"/" \
-            $service/$service/values.yaml
+            ultimate-devops-project-demo/kubernetes/$service/$service/values.yaml
           done
 
       - name: Commit DEV
@@ -91,7 +91,10 @@ jobs:
           git config user.name "ci-bot"
           git config user.email "ci@bot.com"
           git pull --rebase origin main || true
-          git add productcatalog/productcatalog/values.yaml frontendproxy/frontendproxy/values.yaml
+          git add \
+          ultimate-devops-project-demo/kubernetes/productcatalog/productcatalog/values.yaml \
+          ultimate-devops-project-demo/kubernetes/frontendproxy/frontendproxy/values.yaml
+
           git commit -m "dev: deploy ${{ github.sha }} [skip-ci]" || echo "No changes"
           git push
 
