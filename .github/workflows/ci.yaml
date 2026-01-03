@@ -125,7 +125,7 @@ jobs:
           git config user.name "ci-bot"
           git config user.email "ci@bot.com"
           git pull --rebase origin main || true
-          git add env/staging.yaml
+          git add ultimate-devops-project-demo/kubernetes/env/value-staging.yaml
           git commit -m "staging: promote ${{ github.sha }} [skip-ci]" || echo "No changes"
           git push
 
@@ -153,6 +153,6 @@ jobs:
           git config user.name "ci-bot"
           git config user.email "ci@bot.com"
           git pull --rebase origin main || true
-          git add env/prod.yaml
+          git add ultimate-devops-project-demo/kubernetes/env/value-prod.yaml
           git commit -m "prod: promote ${{ github.sha }} [skip-ci]" || echo "No changes"
           git push
